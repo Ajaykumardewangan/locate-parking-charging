@@ -12,7 +12,6 @@ import org.springframework.http.*
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
-import java.lang.Exception
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
@@ -53,24 +52,22 @@ class LocationTraceServiceImpl():LocationTraceService {
     }
 
     fun commonApiService(position: Position, category: String): Callable<JSONObject>{
-        val callable = object : Callable<JSONObject> {
-            override fun call(): JSONObject {
-                var restTemplate = RestTemplate()
-                var headers =  HttpHeaders()
-                headers.accept = Arrays.asList(MediaType.APPLICATION_JSON);
-                var builder = UriComponentsBuilder.fromHttpUrl(appProperties.searchCategs)
-                        .queryParam("at",position.altitude+","+position.longitude)
-                        .queryParam("cat",category)
-                        .queryParam("apiKey",appProperties.apiKey)
-                var entity = HttpEntity<String>(headers)
-                var result= restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, String::class.java)
-                var  result1 = result.body as String
-                var parser =  JSONParser()
-                var jsonObject = parser.parse(result1) as JSONObject
-                return  commonJsonUtils.parseJsonResponse(jsonObject)
-            }
+        return Callable {
+            var restTemplate = RestTemplate()
+            var headers =  HttpHeaders()
+            print("This is inside commonApiService")
+            headers.accept = Arrays.asList(MediaType.APPLICATION_JSON);
+            var builder = UriComponentsBuilder.fromHttpUrl(appProperties.searchCategs)
+                    .queryParam("at",position.altitude+","+position.longitude)
+                    .queryParam("cat",category)
+                    .queryParam("apiKey", appProperties.apiKey)
+            var entity = HttpEntity<String>(headers)
+            var result= restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, String::class.java)
+            var  result1 = result.body as String
+            var parser =  JSONParser()
+            var jsonObject = parser.parse(result1) as JSONObject
+            commonJsonUtils.parseJsonResponse(jsonObject)
         }
-        return callable
     }
 
     fun getAltitudeAndLongitudeByPlace( place : String): Position {

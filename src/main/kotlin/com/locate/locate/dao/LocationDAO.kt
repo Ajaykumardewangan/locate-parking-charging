@@ -1,22 +1,23 @@
 package com.locate.locate.dao
 
 import org.json.simple.JSONObject
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
 class LocationDAO{
-    var locationData = HashMap<String,JSONObject>()
-
+    @Autowired
+    lateinit var  cache : CacheHelper
     fun findLocation(place : String): JSONObject{
         var result  = JSONObject()
-        if(locationData.containsKey(place)){
-            result = locationData.get(place) as JSONObject
+        if (cache.getMapDetailsCacheObj().containsKey(place)) {
+            return cache.getMapDetailsCacheObj().get(place);
         }
         return result
     }
     fun setLocation(place : String, locationDetails : JSONObject){
-        if(!locationData.containsKey(place)){
-            locationData.put(place, locationDetails)
+        if(!cache.getMapDetailsCacheObj().containsKey(place)){
+            cache.getMapDetailsCacheObj().put(place, locationDetails);
         }
     }
 }
