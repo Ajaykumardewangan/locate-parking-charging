@@ -5,5 +5,5 @@ import org.springframework.http.ResponseEntity
 
 
 interface ParkingService {
-     fun getParkingChargingStations(): ResponseEntity<JSONObject>
+     fun getParkingChargingStations(place:String): JSONObject
 }
