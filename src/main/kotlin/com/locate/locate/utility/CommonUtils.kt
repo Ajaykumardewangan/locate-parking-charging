@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 @Component
 class CommonUtils{
     fun parseJsonResponse(parkingJson : JSONObject):JSONObject{
-        if(parkingJson != null){
+        if(!parkingJson.isNullOrEmpty()){
             var newJson  = parkingJson.get("results") as JSONObject
             if( ! newJson.isNullOrEmpty() ) {
                 var jsonArr = newJson.get("items") as JSONArray
@@ -21,7 +21,7 @@ class CommonUtils{
        return JSONObject()
     }
     fun parseAltitudeLongitude(placeJson : JSONObject): Position {
-        if(placeJson != null){
+        if(!placeJson.isNullOrEmpty()){
             var newJson  = placeJson.get("Response") as JSONObject
             if( ! newJson.isNullOrEmpty() ) {
                 var jsonArr = newJson.get("View") as JSONArray
@@ -39,13 +39,5 @@ class CommonUtils{
             }
         }
         return Position()
-    }
-
-
-    fun parseOnStreetParking(): String{
-        return ""
-    }
-    fun parseChargingStation(): String{
-        return ""
     }
 }

@@ -4,7 +4,7 @@ import org.json.simple.JSONObject
 import org.springframework.stereotype.Component
 
 @Component
-class LocatinoDAO{
+class LocationDAO{
     var locationData = HashMap<String,JSONObject>()
 
     fun findLocation(place : String): JSONObject{
