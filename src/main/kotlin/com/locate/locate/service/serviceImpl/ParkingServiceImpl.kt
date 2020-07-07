@@ -1,5 +1,6 @@
 package com.locate.locate.service.serviceImpl
 
+import com.locate.locate.dao.LocatinoDAO
 import com.locate.locate.model.Position
 import com.locate.locate.service.ParkingService
 import com.locate.locate.utility.CommonUtils
@@ -20,18 +21,24 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 @Service
-class ParkingServiceImpl(private val commonJsonUtils: CommonUtils):ParkingService {
+class ParkingServiceImpl(private val commonJsonUtils: CommonUtils,
+                         private val locationDao : LocatinoDAO):ParkingService {
 
     override fun getParkingChargingStations(place:String): JSONObject {
         print("This is a place given by user : $place")
         var resultJson = JSONObject()
-        var position = getAltitudeAndLongitudeByPlace(place)
-        if(!position.isEmplty()) {
-            resultJson.put("Parking_Place", getParkingPlace(position))
-            resultJson.put("Charging_Station", getChargingStations(position))
-            resultJson.put("Eat_Drink_Place", getEatDrinkPlace(position))
-        }else
-            resultJson.put("Description", "No result found for this location")
+        resultJson =  locationDao.findLocation(place)
+        println(resultJson.toString())
+        if(resultJson.isNullOrEmpty()) {
+            var position = getAltitudeAndLongitudeByPlace(place)
+            if (!position.isEmplty()) {
+                resultJson.put("Parking_Place", getParkingPlace(position))
+                resultJson.put("Charging_Station", getChargingStations(position))
+                resultJson.put("Eat_Drink_Place", getEatDrinkPlace(position))
+                locationDao.setLocation(place, resultJson)
+            } else
+                resultJson.put("Description", "No result found for this location")
+        }
         return resultJson;
     }
 
@@ -102,7 +109,6 @@ class ParkingServiceImpl(private val commonJsonUtils: CommonUtils):ParkingServic
         var result= restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, String::class.java)
         var  result1 = result.body as String
         var parser =  JSONParser()
-        print(result1)
         var jsonObject = parser.parse(result1) as JSONObject
         return commonJsonUtils.parseAltitudeLongitude(jsonObject)
     }
